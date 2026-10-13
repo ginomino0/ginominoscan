@@ -1,15 +1,15 @@
 const SOURCES = [
   { name: 'Codici Sconto Sconti', username: 'codici_sconto_sconti', url: 'https://t.me/s/codici_sconto_sconti', label: 'Codici sconto e offerte' },
-  { name: 'Ultima Offerta', username: 'ultimaofferta', url: 'https://t.me/s/ultimaofferta', label: 'Offerte recenti' },
   { name: 'Sconti Errati', username: 'scontierrati', url: 'https://t.me/s/scontierrati', label: 'Sconti anomali ed errori prezzo' },
-  { name: 'Errori Bombe', username: 'ErroriBombe', url: 'https://t.me/s/ErroriBombe', label: 'Errori prezzo e offerte lampo' },
-  { name: 'Errori di Prezzo Ufficiale', username: 'errori_di_prezzo', url: 'https://t.me/s/errori_di_prezzo', label: 'Errori di prezzo e offerte verificate' },
-  { name: 'Errori Prezzo Italia', username: 'erroriprezzoitalia', url: 'https://t.me/s/erroriprezzoitalia', label: 'Offerte Amazon e prezzi anomali' },
   { name: 'Tecnofferte', username: 'tecnofferte', url: 'https://t.me/s/tecnofferte', label: 'Offerte Amazon ed eBay' },
   { name: 'Offertazze', username: 'offertazze', url: 'https://t.me/s/offertazze', label: 'Offerte lampo ed errori di prezzo' },
-  { name: 'Outlet Amazon Italia', username: 'outletamazonitalia', url: 'https://t.me/s/outletamazonitalia', label: 'Outlet, coupon e super sconti' },
+  { name: 'Errori Prezzo Italia', username: 'erroriprezzoitalia', url: 'https://t.me/s/erroriprezzoitalia', label: 'Offerte Amazon e prezzi anomali' },
   { name: 'Offerte.tech', username: 'offertepuntotech', url: 'https://t.me/s/offertepuntotech', label: 'Tecnologia e offerte' },
-  { name: 'Cianfrusaglie', username: 'Cianfrusaglie', url: 'https://t.me/s/Cianfrusaglie', label: 'Offerte varie' }
+  { name: 'Cianfrusaglie', username: 'Cianfrusaglie', url: 'https://t.me/s/Cianfrusaglie', label: 'Offerte varie' },
+  { name: 'Offerte iSpazio Amazon', username: 'scontiamolo', url: 'https://t.me/s/scontiamolo', label: 'Offerte Amazon, coupon e ribassi' },
+  { name: 'RafficAffari', username: 'rafficaffari', url: 'https://t.me/s/rafficaffari', label: 'Offerte bomba ed errori di prezzo' },
+  { name: 'OfferteDale', username: 'offertedale', url: 'https://t.me/s/offertedale', label: 'Offerte Amazon ed eBay' },
+  { name: 'OfferteDale Bombe', username: 'offertedalebombe', url: 'https://t.me/s/offertedalebombe', label: 'Offerte lampo e prezzi anomali' }
 ];
 
 function decode(s='') {
@@ -48,14 +48,41 @@ function parseDate(block) {
   return null;
 }
 function extractImage(block) {
-  // Telegram pubblica spesso la foto come background-image del photo_wrap.
-  const patterns = [
-    /tgme_widget_message_photo_wrap[^>]*style="[^"]*background-image\s*:\s*url\(['\"]?([^'\")]+)['\"]?\)/i,
-    /background-image\s*:\s*url\(['\"]?((?:https?:)?\/\/[^'\")]+)['\"]?\)/i,
-    /<img[^>]+(?:src|data-src)="((?:https?:)?\/\/[^"]+)"/i
-  ];
-  for (const re of patterns) { const m = block.match(re); if (m) { const u = decode(m[1]); if (/^\/\//.test(u)) return 'https:' + u; if (/^https:\/\//i.test(u)) return u; } }
-  return null;
+  // I post Telegram possono usare background-image oppure un'anteprima del link Amazon.
+  const candidates = [];
+  const add = value => {
+    if (!value) return;
+    let u = decode(value).replace(/&amp;/g, '&').replace(/\\u0026/g, '&').trim();
+    if (u.startsWith('//')) u = 'https:' + u;
+    if (/^https:\/\//i.test(u) && /(?:telesco\.pe|telegram|amazon|media-amazon|ssl-images|images-amazon|m\.media-amazon|cdn\.)/i.test(u)) candidates.push(u);
+  };
+  // Photo allegata direttamente al messaggio.
+  const photoBlocks = block.match(/<div[^>]+class="[^"]*tgme_widget_message_photo_wrap[^"]*"[^>]*>/gi) || [];
+  for (const tag of photoBlocks) {
+    const m = tag.match(/style="([^"]*)"/i);
+    if (m) {
+      const bg = m[1].match(/background-image\s*:\s*url\(\s*['"]?([^'")]+)['"]?\s*\)/i);
+      if (bg) add(bg[1]);
+    }
+    const direct = tag.match(/data-(?:src|url)="([^"]+)"/i);
+    if (direct) add(direct[1]);
+  }
+  // Anteprima incorporata del prodotto collegato (spesso contiene la foto Amazon).
+  const previewBlocks = block.match(/<div[^>]+class="[^"]*tgme_widget_message_link_preview[^"]*"[\s\S]*?(?=<\/div>\s*<div|$)/gi) || [];
+  for (const pb of previewBlocks) {
+    const imgs = pb.match(/(?:background-image\s*:\s*url\(\s*['"]?[^'")]+['"]?\s*\)|<img[^>]+(?:src|data-src)="[^"]+")/gi) || [];
+    for (const item of imgs) {
+      const bg = item.match(/url\(\s*['"]?([^'")]+)['"]?\s*\)/i);
+      const im = item.match(/(?:src|data-src)="([^"]+)"/i);
+      if (bg) add(bg[1]); else if (im) add(im[1]);
+    }
+  }
+  // Fallback generico: Telegram può cambiare l'ordine degli attributi.
+  const styles = block.match(/style="[^"]*background-image\s*:\s*url\([^)]*\)[^"]*"/gi) || [];
+  for (const tag of styles) { const m = tag.match(/url\(\s*['"]?([^'")]+)['"]?\s*\)/i); if (m) add(m[1]); }
+  const imgs = block.match(/<img\b[^>]+(?:src|data-src)="[^"]+"[^>]*>/gi) || [];
+  for (const tag of imgs) { const m = tag.match(/(?:src|data-src)="([^"]+)"/i); if (m) add(m[1]); }
+  return [...new Set(candidates)].find(u => !/emoji|avatar|profile|sticker/i.test(u)) || null;
 }
 function extractLinks(block) {
   const links = [];
