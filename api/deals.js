@@ -9,7 +9,36 @@ const SOURCES = [
   { name: 'Offerte iSpazio Amazon', username: 'scontiamolo', url: 'https://t.me/s/scontiamolo', label: 'Offerte Amazon, coupon e ribassi' },
   { name: 'RafficAffari', username: 'rafficaffari', url: 'https://t.me/s/rafficaffari', label: 'Offerte bomba ed errori di prezzo' },
   { name: 'OfferteDale', username: 'offertedale', url: 'https://t.me/s/offertedale', label: 'Offerte Amazon ed eBay' },
-  { name: 'OfferteDale Bombe', username: 'offertedalebombe', url: 'https://t.me/s/offertedalebombe', label: 'Offerte lampo e prezzi anomali' }
+  { name: 'OfferteDale Bombe', username: 'offertedalebombe', url: 'https://t.me/s/offertedalebombe', label: 'Offerte lampo e prezzi anomali' },
+  { name: 'Errore di Prezzo', username: 'errore_di_prezzo', url: 'https://t.me/s/errore_di_prezzo', label: 'Errori di prezzo Amazon' },
+  { name: 'Amazon Errori Prezzo', username: 'amazon_errori_prezzo', url: 'https://t.me/s/amazon_errori_prezzo', label: 'Errori e super offerte Amazon' },
+  { name: 'Offerte Amazon Italia', username: 'offerteamazonsconti', url: 'https://t.me/s/offerteamazonsconti', label: 'Offerte e sconti Amazon' },
+  { name: 'Offerte ed Affari Online', username: 'offertedaffarionline', url: 'https://t.me/s/offertedaffarionline', label: 'Offerte selezionate ed errori prezzo' },
+  { name: 'Errori di Prezzo e Sconti', username: 'erroriprezzoesconti', url: 'https://t.me/s/erroriprezzoesconti', label: 'Sconti e prezzi anomali' },
+  { name: 'Super Offerte Amazon Italy', username: 'super_offerte_amazon_italy', url: 'https://t.me/s/super_offerte_amazon_italy', label: 'Offerte Amazon' },
+  { name: 'Il Re degli Affari', username: 'il_re_degli_affari', url: 'https://t.me/s/il_re_degli_affari', label: 'Offerte verificate e minimi storici' },
+  { name: 'ErroriDiPrezzo', username: 'ErroriDiPrezzo', url: 'https://t.me/s/ErroriDiPrezzo', label: 'Segnalazioni di errori di prezzo' },
+  { name: 'Offerte & Errori Prezzo', username: 'OfferteErroriSconti', url: 'https://t.me/s/OfferteErroriSconti', label: 'Offerte e prezzi sbagliati' },
+  { name: 'Offerte Tech Amazon IT', username: 'offertetechamazonit', url: 'https://t.me/s/offertetechamazonit', label: 'Offerte tecnologia Amazon' },
+  { name: 'Offerte Amazon eBay Gratis', username: 'offerteescontigratis', url: 'https://t.me/s/offerteescontigratis', label: 'Offerte e sconti vari' },
+  { name: 'Amazon Offerte Italia', username: 'amazonofferteitalia', url: 'https://t.me/s/amazonofferteitalia', label: 'Offerte Amazon Italia' },
+  { name: 'Sconti Italiani', username: 'sconti_italiani', url: 'https://t.me/s/sconti_italiani', label: 'Sconti e offerte' },
+  { name: 'Offerte dal Web', username: 'offertedalweb', url: 'https://t.me/s/offertedalweb', label: 'Offerte da negozi online' },
+  { name: 'Offerte Lampo Italia', username: 'offertelampoitalia', url: 'https://t.me/s/offertelampoitalia', label: 'Offerte lampo' },
+  { name: 'Offerte Online Italia', username: 'offerteonlineitalia', url: 'https://t.me/s/offerteonlineitalia', label: 'Offerte online' },
+  { name: 'Offerte e Sconti', username: 'offerte_e_sconti', url: 'https://t.me/s/offerte_e_sconti', label: 'Offerte e codici sconto' },
+  { name: 'Offerte Amazon Prime', username: 'offerteamazonprime', url: 'https://t.me/s/offerteamazonprime', label: 'Offerte Amazon e Prime' },
+  { name: 'Offerte Giornaliere', username: 'offertegiornaliere', url: 'https://t.me/s/offertegiornaliere', label: 'Offerte quotidiane' },
+  { name: 'Offerte Hi-Tech', username: 'offerte_hitech', url: 'https://t.me/s/offerte_hitech', label: 'Tecnologia e informatica' },
+  { name: 'Offerte Telefonia', username: 'telefonino_offerte', url: 'https://t.me/s/telefonino_offerte', label: 'Smartphone e accessori' },
+  { name: 'OfferteDale Casa', username: 'offertedalecasa', url: 'https://t.me/s/offertedalecasa', label: 'Casa ed elettrodomestici' },
+  { name: 'OfferteDale Fashion', username: 'offertedalefashion', url: 'https://t.me/s/offertedalefashion', label: 'Moda e accessori' },
+  { name: 'OfferteDale Sport', username: 'offertedalesport', url: 'https://t.me/s/offertedalesport', label: 'Sport e attività outdoor' },
+  { name: 'Super Offerte Italia', username: 'superofferteitalia', url: 'https://t.me/s/superofferteitalia', label: 'Offerte generaliste' },
+  { name: 'Offerte Amazon Tech', username: 'offerteamazontech', url: 'https://t.me/s/offerteamazontech', label: 'Tecnologia Amazon' },
+  { name: 'Offerte Amazon e Coupon', username: 'amazon_coupon_offerte', url: 'https://t.me/s/amazon_coupon_offerte', label: 'Coupon e offerte Amazon' },
+  { name: 'Prezzi Bomba', username: 'prezzibomba', url: 'https://t.me/s/prezzibomba', label: 'Prezzi bassi e offerte lampo' },
+  { name: 'Offerte Smart Italia', username: 'offertesmartitalia', url: 'https://t.me/s/offertesmartitalia', label: 'Offerte selezionate' }
 ];
 
 function decode(s='') {
@@ -91,7 +120,7 @@ function extractLinks(block) {
   while ((m = re.exec(block))) {
     const href = decode(m[1].replace(/&amp;/g, '&'));
     // Keep links that may lead to an Amazon product, including common short links.
-    if (/(?:amazon\.it\/(?:dp|gp\/product|gp\/aw\/d|exec\/obidos\/ASIN)\/|amzn\.to\/|amzn\.eu\/|amazon\.it\/.*(?:tag=|ref=)|ofclub\.click\/)/i.test(href)) links.push(href);
+    if (/(?:amazon\.(?:it|com)\/(?:dp|gp\/product|gp\/aw\/d|exec\/obidos\/ASIN)\/|amzn\.(?:to|eu)\/|amzlink\.to\/|amazon\.(?:it|com)\/.*(?:tag=|ref=)|ofclub\.click\/)/i.test(href)) links.push(href);
   }
   return [...new Set(links)];
 }
@@ -103,7 +132,7 @@ function extractMessages(html, source) {
     const text = plain(textMatch[1]);
     const links = extractLinks(block);
     const image = extractImage(block);
-    if (!links.length || !/amazon|amzn\.(?:to|eu)|ofclub\.click/i.test(links.join(' '))) return null;
+    if (!links.length || !/amazon|amzn\.(?:to|eu)|amzlink\.to|ofclub\.click/i.test(links.join(' '))) return null;
     const { price, oldPrice } = pricePair(text);
     const titleLines = text.split('\n').map(x => x.trim()).filter(Boolean);
     let title = titleLines.find(x => !/^(?:🛍|💶|💰|👉|🚚|📦|🔥|😍|❌|#|agg\.?|aggiornato|venduto|spedito|prezzo|risparmia)/i.test(x) && !/https?:\/\//i.test(x));
@@ -116,6 +145,25 @@ function extractMessages(html, source) {
     const postLink = (block.match(/<a class="tgme_widget_message_date"[^>]*href="([^"]+)"/i) || [])[1];
     return { id: `${source.name}-${date || index}-${links[0]}`, title, price, oldPrice, discount, url: links[0], image, source: source.name, sourceLabel: source.label, publishedAt: date, postUrl: postLink ? decode(postLink) : source.url, shipping, rawText: text.slice(0, 1000) };
   }).filter(Boolean);
+}
+
+function productKey(deal) {
+  const urls = [deal.url, deal.postUrl].filter(Boolean);
+  for (const raw of urls) {
+    try {
+      const u = new URL(raw);
+      const path = decodeURIComponent(u.pathname);
+      const m = path.match(/\/(?:dp|gp\/product|gp\/aw\/d|exec\/obidos\/ASIN)\/([A-Z0-9]{10})(?:[/?]|$)/i);
+      if (m) return 'asin:' + m[1].toUpperCase();
+    } catch {}
+  }
+  // For shortened/affiliate links, identical normalized URLs still collapse.
+  try {
+    const u = new URL(deal.url);
+    u.hash = '';
+    for (const key of [...u.searchParams.keys()]) if (/^(tag|ref|linkcode|camp|creative|creativeasin|ascsubtag|utm_.+)$/i.test(key)) u.searchParams.delete(key);
+    return 'url:' + u.hostname.toLowerCase().replace(/^www\./, '') + u.pathname.replace(/\/$/, '') + (u.searchParams.toString() ? '?' + u.searchParams.toString() : '');
+  } catch { return 'url:' + String(deal.url || '').trim(); }
 }
 
 module.exports = async function handler(req, res) {
@@ -132,7 +180,19 @@ module.exports = async function handler(req, res) {
     } catch (e) { return { source: source.name, ok: false, deals: [], dealsCount: 0, checkedAt: new Date().toISOString(), error: String(e.message || e) }; }
   }));
   const map = new Map();
-  for (const r of results) for (const d of r.deals) if (!map.has(d.url)) map.set(d.url, d);
+  for (const r of results) for (const d of r.deals) {
+    const key = productKey(d);
+    const existing = map.get(key);
+    if (!existing) map.set(key, { ...d, sources: [d.source] });
+    else {
+      if (!existing.sources.includes(d.source)) existing.sources.push(d.source);
+      // Prefer the richer record when the same Amazon product is reposted.
+      if ((!existing.image && d.image) || (existing.price == null && d.price != null) || (!existing.publishedAt && d.publishedAt)) {
+        const sources = existing.sources;
+        map.set(key, { ...d, ...existing, image: existing.image || d.image, price: existing.price ?? d.price, oldPrice: existing.oldPrice ?? d.oldPrice, discount: existing.discount ?? d.discount, publishedAt: existing.publishedAt || d.publishedAt, sources });
+      }
+    }
+  }
   const deals = [...map.values()].sort((a,b) => (Date.parse(b.publishedAt || 0) || 0) - (Date.parse(a.publishedAt || 0) || 0));
   res.statusCode = 200;
   return res.end(JSON.stringify({ ok: results.some(r => r.ok), updatedAt: new Date().toISOString(), sources: results.map(({source,ok,checkedAt,error,dealsCount}) => ({source,ok,checkedAt,error,dealsCount})), deals, note: 'Le offerte sono segnalazioni di fonti pubbliche. Prezzo, disponibilità, sconto e spedizione vanno verificati su Amazon prima dell’acquisto.' }));
