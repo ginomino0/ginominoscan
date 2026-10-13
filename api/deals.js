@@ -1,6 +1,10 @@
 const SOURCES = [
-  { name: 'Offerte.tech', url: 'https://telegram.me/s/offertepuntotech', label: 'Tecnologia e offerte' },
-  { name: 'Cianfrusaglie', url: 'https://telegram.me/s/Cianfrusaglie', label: 'Offerte varie' }
+  { name: 'Codici Sconto Sconti', username: 'codici_sconto_sconti', url: 'https://t.me/s/codici_sconto_sconti', label: 'Codici sconto e offerte' },
+  { name: 'Ultima Offerta', username: 'ultimaofferta', url: 'https://t.me/s/ultimaofferta', label: 'Offerte recenti' },
+  { name: 'Sconti Errati', username: 'scontierrati', url: 'https://t.me/s/scontierrati', label: 'Sconti anomali ed errori prezzo' },
+  { name: 'Errori Bombe', username: 'ErroriBombe', url: 'https://t.me/s/ErroriBombe', label: 'Errori prezzo e offerte lampo' },
+  { name: 'Offerte.tech', username: 'offertepuntotech', url: 'https://t.me/s/offertepuntotech', label: 'Tecnologia e offerte' },
+  { name: 'Cianfrusaglie', username: 'Cianfrusaglie', url: 'https://t.me/s/Cianfrusaglie', label: 'Offerte varie' }
 ];
 
 function decode(s='') {
@@ -38,6 +42,16 @@ function parseDate(block) {
   if (m) { const d = new Date(m[1]); if (!Number.isNaN(d.getTime())) return d.toISOString(); }
   return null;
 }
+function extractImage(block) {
+  // Telegram pubblica spesso la foto come background-image del photo_wrap.
+  const patterns = [
+    /tgme_widget_message_photo_wrap[^>]*style="[^"]*background-image\s*:\s*url\(['\"]?([^'\")]+)['\"]?\)/i,
+    /background-image\s*:\s*url\(['\"]?(https?:\/\/[^'\")]+)['\"]?\)/i,
+    /<img[^>]+src="(https?:\/\/[^"]+)"/i
+  ];
+  for (const re of patterns) { const m = block.match(re); if (m && /^https:\/\//i.test(decode(m[1]))) return decode(m[1]); }
+  return null;
+}
 function extractLinks(block) {
   const links = [];
   const re = /<a\b[^>]*href="(https?:\/\/[^\"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
@@ -55,6 +69,7 @@ function extractMessages(html, source) {
     if (!textMatch) return null;
     const text = plain(textMatch[1]);
     const links = extractLinks(block);
+    const image = extractImage(block);
     if (!links.length || !/amazon|amzn\.to|ofclub\.click/i.test(links.join(' '))) return null;
     const { price, oldPrice } = pricePair(text);
     const titleLines = text.split('\n').map(x => x.trim()).filter(Boolean);
@@ -66,7 +81,7 @@ function extractMessages(html, source) {
     const shipping = /venduto e spedito da amazon|venduto da amazon/i.test(text) ? 'Amazon indicato nel post' : /spedito da amazon/i.test(text) ? 'Spedito da Amazon indicato nel post' : 'Spedizione/Prime da verificare';
     const date = parseDate(block);
     const postLink = (block.match(/<a class="tgme_widget_message_date"[^>]*href="([^"]+)"/i) || [])[1];
-    return { id: `${source.name}-${date || index}-${links[0]}`, title, price, oldPrice, discount, url: links[0], source: source.name, sourceLabel: source.label, publishedAt: date, postUrl: postLink ? decode(postLink) : source.url, shipping, rawText: text.slice(0, 1000) };
+    return { id: `${source.name}-${date || index}-${links[0]}`, title, price, oldPrice, discount, url: links[0], image, source: source.name, sourceLabel: source.label, publishedAt: date, postUrl: postLink ? decode(postLink) : source.url, shipping, rawText: text.slice(0, 1000) };
   }).filter(Boolean);
 }
 
