@@ -1,0 +1,8 @@
+{
+  "name": "amazon-radar-gratuito",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Radar gratuito di offerte Amazon segnalate da fonti pubbliche",
+  "scripts": {"dev": "vercel dev"},
+  "engines": {"node": ">=18"}
+}
