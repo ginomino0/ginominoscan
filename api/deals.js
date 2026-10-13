@@ -3,6 +3,11 @@ const SOURCES = [
   { name: 'Ultima Offerta', username: 'ultimaofferta', url: 'https://t.me/s/ultimaofferta', label: 'Offerte recenti' },
   { name: 'Sconti Errati', username: 'scontierrati', url: 'https://t.me/s/scontierrati', label: 'Sconti anomali ed errori prezzo' },
   { name: 'Errori Bombe', username: 'ErroriBombe', url: 'https://t.me/s/ErroriBombe', label: 'Errori prezzo e offerte lampo' },
+  { name: 'Errori di Prezzo Ufficiale', username: 'errori_di_prezzo', url: 'https://t.me/s/errori_di_prezzo', label: 'Errori di prezzo e offerte verificate' },
+  { name: 'Errori Prezzo Italia', username: 'erroriprezzoitalia', url: 'https://t.me/s/erroriprezzoitalia', label: 'Offerte Amazon e prezzi anomali' },
+  { name: 'Tecnofferte', username: 'tecnofferte', url: 'https://t.me/s/tecnofferte', label: 'Offerte Amazon ed eBay' },
+  { name: 'Offertazze', username: 'offertazze', url: 'https://t.me/s/offertazze', label: 'Offerte lampo ed errori di prezzo' },
+  { name: 'Outlet Amazon Italia', username: 'outletamazonitalia', url: 'https://t.me/s/outletamazonitalia', label: 'Outlet, coupon e super sconti' },
   { name: 'Offerte.tech', username: 'offertepuntotech', url: 'https://t.me/s/offertepuntotech', label: 'Tecnologia e offerte' },
   { name: 'Cianfrusaglie', username: 'Cianfrusaglie', url: 'https://t.me/s/Cianfrusaglie', label: 'Offerte varie' }
 ];
@@ -46,19 +51,20 @@ function extractImage(block) {
   // Telegram pubblica spesso la foto come background-image del photo_wrap.
   const patterns = [
     /tgme_widget_message_photo_wrap[^>]*style="[^"]*background-image\s*:\s*url\(['\"]?([^'\")]+)['\"]?\)/i,
-    /background-image\s*:\s*url\(['\"]?(https?:\/\/[^'\")]+)['\"]?\)/i,
-    /<img[^>]+src="(https?:\/\/[^"]+)"/i
+    /background-image\s*:\s*url\(['\"]?((?:https?:)?\/\/[^'\")]+)['\"]?\)/i,
+    /<img[^>]+(?:src|data-src)="((?:https?:)?\/\/[^"]+)"/i
   ];
-  for (const re of patterns) { const m = block.match(re); if (m && /^https:\/\//i.test(decode(m[1]))) return decode(m[1]); }
+  for (const re of patterns) { const m = block.match(re); if (m) { const u = decode(m[1]); if (/^\/\//.test(u)) return 'https:' + u; if (/^https:\/\//i.test(u)) return u; } }
   return null;
 }
 function extractLinks(block) {
   const links = [];
-  const re = /<a\b[^>]*href="(https?:\/\/[^\"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+  const re = /<a\b[^>]*href="([^"]+)"[^>]*>/gi;
   let m;
   while ((m = re.exec(block))) {
     const href = decode(m[1].replace(/&amp;/g, '&'));
-    if (/amazon\.it\/(?:dp|gp\/product|gp\/aw\/d)\//i.test(href) || /amzn\.to\//i.test(href) || /ofclub\.click\//i.test(href)) links.push(href);
+    // Keep links that may lead to an Amazon product, including common short links.
+    if (/(?:amazon\.it\/(?:dp|gp\/product|gp\/aw\/d|exec\/obidos\/ASIN)\/|amzn\.to\/|amzn\.eu\/|amazon\.it\/.*(?:tag=|ref=)|ofclub\.click\/)/i.test(href)) links.push(href);
   }
   return [...new Set(links)];
 }
@@ -70,7 +76,7 @@ function extractMessages(html, source) {
     const text = plain(textMatch[1]);
     const links = extractLinks(block);
     const image = extractImage(block);
-    if (!links.length || !/amazon|amzn\.to|ofclub\.click/i.test(links.join(' '))) return null;
+    if (!links.length || !/amazon|amzn\.(?:to|eu)|ofclub\.click/i.test(links.join(' '))) return null;
     const { price, oldPrice } = pricePair(text);
     const titleLines = text.split('\n').map(x => x.trim()).filter(Boolean);
     let title = titleLines.find(x => !/^(?:🛍|💶|💰|👉|🚚|📦|🔥|😍|❌|#|agg\.?|aggiornato|venduto|spedito|prezzo|risparmia)/i.test(x) && !/https?:\/\//i.test(x));
@@ -94,12 +100,13 @@ module.exports = async function handler(req, res) {
       const r = await fetch(source.url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; AmazonRadar/1.0; +https://vercel.com)', 'accept-language': 'it-IT,it;q=0.9,en;q=0.7' }, signal: AbortSignal.timeout(9000) });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const html = await r.text();
-      return { source: source.name, ok: true, deals: extractMessages(html, source), checkedAt: new Date().toISOString() };
-    } catch (e) { return { source: source.name, ok: false, deals: [], checkedAt: new Date().toISOString(), error: String(e.message || e) }; }
+      const deals = extractMessages(html, source);
+      return { source: source.name, ok: true, deals, dealsCount: deals.length, checkedAt: new Date().toISOString() };
+    } catch (e) { return { source: source.name, ok: false, deals: [], dealsCount: 0, checkedAt: new Date().toISOString(), error: String(e.message || e) }; }
   }));
   const map = new Map();
   for (const r of results) for (const d of r.deals) if (!map.has(d.url)) map.set(d.url, d);
   const deals = [...map.values()].sort((a,b) => (Date.parse(b.publishedAt || 0) || 0) - (Date.parse(a.publishedAt || 0) || 0));
   res.statusCode = 200;
-  return res.end(JSON.stringify({ ok: results.some(r => r.ok), updatedAt: new Date().toISOString(), sources: results.map(({source,ok,checkedAt,error}) => ({source,ok,checkedAt,error})), deals, note: 'Le offerte sono segnalazioni di fonti pubbliche. Prezzo, disponibilità, sconto e spedizione vanno verificati su Amazon prima dell’acquisto.' }));
+  return res.end(JSON.stringify({ ok: results.some(r => r.ok), updatedAt: new Date().toISOString(), sources: results.map(({source,ok,checkedAt,error,dealsCount}) => ({source,ok,checkedAt,error,dealsCount})), deals, note: 'Le offerte sono segnalazioni di fonti pubbliche. Prezzo, disponibilità, sconto e spedizione vanno verificati su Amazon prima dell’acquisto.' }));
 };
