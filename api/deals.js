@@ -26,29 +26,16 @@ const SOURCES = [
   { name: 'Sconti e Offerte Italia', username: 'scontiofferteita', url: 'https://t.me/s/scontiofferteita', label: 'Sconti Amazon e offerte generali' },
   { name: 'Amazon Offerte ITA', username: 'amazon_offerte_italy', url: 'https://t.me/s/amazon_offerte_italy', label: 'Offerte Amazon Italia' },
   { name: 'Offerte & Sconti Amazon', username: 'sconti_amz_italia', url: 'https://t.me/s/sconti_amz_italia', label: 'Offerte e coupon Amazon' },
-  { name: 'Offerte Amazon Tech', username: 'prezzopiubasso_tech', url: 'https://t.me/s/prezzopiubasso_tech', label: 'Tecnologia e hardware' },
   { name: 'Tech Deals Italia', username: 'techdeals_italia', url: 'https://t.me/s/techdeals_italia', label: 'Offerte tech e informatica' },
   { name: 'Offerte Amazon & Co.', username: 'amazontech', url: 'https://t.me/s/amazontech', label: 'Offerte Amazon e buoni sconto' },
   { name: 'Offerte AmazonIT', username: 'offerteamzitby', url: 'https://t.me/s/offerteamzitby', label: 'Offerte Amazon varie' },
   { name: 'Offerte', username: 'offerte', url: 'https://t.me/s/offerte', label: 'Offerte online e coupon' },
   { name: 'OFFERTEITALIA', username: 'offerte_italia_amazon', url: 'https://t.me/s/offerte_italia_amazon', label: 'Offerte Amazon Italia' },
-  { name: 'OfferteAmazonIT', username: 'offertecommerceit', url: 'https://t.me/s/offertecommerceit', label: 'Offerte e-commerce e Amazon' },
-  { name: 'Le Offerte Di Amazon', username: 'le_offerte_di_amazon', url: 'https://t.me/s/le_offerte_di_amazon', label: 'Offerte Amazon' },
   { name: 'Amazon Sconti & Promozioni', username: 'offertepromoamazonit', url: 'https://t.me/s/offertepromoamazonit', label: 'Promozioni ed errori di prezzo' },
-  { name: 'Sconti Offerte AMZ', username: 'sconti_offerte_amz', url: 'https://t.me/s/sconti_offerte_amz', label: 'Offerte e sconti Amazon' },
-  { name: 'Offerte e Codici Sconto Amazon', username: 'offerte_a_nastro', url: 'https://t.me/s/offerte_a_nastro', label: 'Offerte e codici sconto' },
-  { name: 'Errori di Prezzo Ufficiale', username: 'errori_di_prezzo', url: 'https://t.me/s/errori_di_prezzo', label: 'Errori di prezzo e offerte' },
   { name: 'AMAZON Sconti per tutti', username: 'amazon_scontipertutti', url: 'https://t.me/s/amazon_scontipertutti', label: 'Offerte Amazon generaliste' },
   { name: 'Amazon.it Offerte', username: 'amazonitalyufficiale', url: 'https://t.me/s/amazonitalyufficiale', label: 'Offerte e coupon Amazon' },
   { name: 'Sconti Amazon', username: 'vitaversoamazon', url: 'https://t.me/s/vitaversoamazon', label: 'Sconti e prezzi bassi' },
-  { name: 'Codici Sconto Amazon', username: 'amazon_free_coupons', url: 'https://t.me/s/amazon_free_coupons', label: 'Codici sconto e offerte' },
   { name: 'Offerte Tech Italia', username: 'mente_informatica', url: 'https://t.me/s/mente_informatica', label: 'Offerte tecnologia e informatica' },
-  { name: 'Offerte Amazon Prime Italia', username: 'amazon_prime_italia', url: 'https://t.me/s/amazon_prime_italia', label: 'Offerte Amazon e Prime' },
-  { name: 'Amazon Offerte e Coupon', username: 'amazon_offerte_coupon', url: 'https://t.me/s/amazon_offerte_coupon', label: 'Coupon e promozioni Amazon' },
-  { name: 'Offerte Flash Amazon', username: 'offerte_flash_amazon', url: 'https://t.me/s/offerte_flash_amazon', label: 'Offerte lampo Amazon' },
-  { name: 'Offerte Amazon Daily', username: 'amazon_offerte_daily', url: 'https://t.me/s/amazon_offerte_daily', label: 'Offerte Amazon quotidiane' },
-  { name: 'Sconti Amazon Italia', username: 'sconti_amazon_italia', url: 'https://t.me/s/sconti_amazon_italia', label: 'Sconti Amazon Italia' },
-  { name: 'Offerte e Coupon Italia', username: 'offerte_coupon_italia', url: 'https://t.me/s/offerte_coupon_italia', label: 'Offerte e coupon' }
 ];
 
 function decode(s='') {
@@ -57,29 +44,47 @@ function decode(s='') {
 function plain(s='') {
   return decode(s.replace(/<br\s*\/?\s*>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<[^>]*>/g, ' ')).replace(/[\t\r ]+/g, ' ').replace(/\n\s+/g, '\n').trim();
 }
-function money(s) {
+function normalizeMoney(raw) {
+  if (!raw) return null;
+  let s = String(raw).replace(/\s/g, '').replace(/[^0-9.,]/g, '');
   if (!s) return null;
-  const m = s.match(/(?:€\s*)?(\d{1,4}(?:[.,]\d{1,2})?)\s*€/i) || s.match(/€\s*(\d{1,4}(?:[.,]\d{1,2})?)/i) || s.match(/(\d{1,4}[.,]\d{2})\s*(?:euro|eur)/i);
-  if (!m) return null;
-  const n = Number(m[1].replace(/\./g, '').replace(',', '.'));
-  return Number.isFinite(n) ? n : null;
-}
-function pricePair(text) {
-  const vals = [];
-  const re = /(?:€\s*)?(\d{1,4}(?:[.,]\d{1,2})?)\s*€/g;
-  let m;
-  while ((m = re.exec(text)) && vals.length < 4) {
-    const n = Number(m[1].replace(/\./g, '').replace(',', '.'));
-    if (Number.isFinite(n)) vals.push(n);
-  }
-  if (!vals.length) {
-    const re2 = /€\s*(\d{1,4}(?:[.,]\d{1,2})?)/g;
-    while ((m = re2.exec(text)) && vals.length < 4) {
-      const n = Number(m[1].replace(/\./g, '').replace(',', '.'));
-      if (Number.isFinite(n)) vals.push(n);
+  const comma = s.lastIndexOf(','), dot = s.lastIndexOf('.');
+  if (comma >= 0 && dot >= 0) {
+    // L'ultimo separatore è quello decimale: 1.999,99 oppure 1,999.99.
+    const decimal = Math.max(comma, dot);
+    s = s.slice(0, decimal).replace(/[.,]/g, '') + '.' + s.slice(decimal + 1);
+  } else if (comma >= 0 || dot >= 0) {
+    const sep = comma >= 0 ? ',' : '.';
+    const parts = s.split(sep);
+    const tail = parts[parts.length - 1];
+    if (parts.length > 2) {
+      const decimalLike = tail.length === 2;
+      s = decimalLike ? parts.slice(0, -1).join('').replace(/[.,]/g, '') + '.' + tail : parts.join('');
+    } else if (tail.length === 2) {
+      s = parts[0] + '.' + tail;
+    } else if (tail.length === 3 && parts[0].length <= 3) {
+      // 1.999 € è un prezzo con separatore delle migliaia, non 1,999 €.
+      s = parts.join('');
+    } else {
+      s = parts.join('');
     }
   }
-  return { price: vals[0] ?? null, oldPrice: vals[1] ?? null };
+  const n = Number(s);
+  return Number.isFinite(n) && n >= 0 && n < 1000000 ? n : null;
+}
+function pricePair(text) {
+  // Accetta 19,99 €, 19.99€, €19,99 e importi con separatore delle migliaia.
+  const pattern = /(?:€\s*(\d{1,3}(?:[.,]\d{3})+(?:[.,]\d{2})?|\d+(?:[.,]\d{1,2})?)|(\d{1,3}(?:[.,]\d{3})+(?:[.,]\d{2})?|\d+(?:[.,]\d{1,2})?)\s*(?:€|EUR|euro))/gi;
+  const vals = [];
+  let m;
+  while ((m = pattern.exec(text)) && vals.length < 2) {
+    const n = normalizeMoney(m[1] || m[2]);
+    if (n != null && !vals.some(v => Math.abs(v - n) < 0.001)) vals.push(n);
+  }
+  // Per le offerte, il prezzo pagato è normalmente il più basso: normalizziamo
+  // l'ordine anche quando il post Telegram presenta prima il prezzo originale.
+  vals.sort((a, b) => a - b);
+  return { price: vals[0] ?? null, oldPrice: vals.length > 1 && vals[vals.length - 1] > vals[0] ? vals[vals.length - 1] : null };
 }
 function parseDate(block) {
   const m = block.match(/<time[^>]*datetime="([^"]+)"/i);
@@ -149,7 +154,8 @@ function extractMessages(html, source) {
     if (!title) title = titleLines[0] || 'Offerta Amazon segnalata';
     title = title.replace(/^[^\p{L}\p{N}]+/u, '').slice(0, 180);
     const discountMatch = text.match(/[-−]\s*(\d{1,3})\s*%/);
-    const discount = discountMatch ? Number(discountMatch[1]) : (price && oldPrice && oldPrice > price ? Math.round((1-price/oldPrice)*100) : null);
+    const calculatedDiscount = price != null && oldPrice != null && oldPrice > price ? Math.round((1-price/oldPrice)*100) : null;
+    const discount = calculatedDiscount != null ? calculatedDiscount : (discountMatch ? Number(discountMatch[1]) : null);
     const shipping = /venduto e spedito da amazon|venduto da amazon/i.test(text) ? 'Amazon indicato nel post' : /spedito da amazon/i.test(text) ? 'Spedito da Amazon indicato nel post' : 'Spedizione/Prime da verificare';
     const date = parseDate(block);
     const postLink = (block.match(/<a class="tgme_widget_message_date"[^>]*href="([^"]+)"/i) || [])[1];
